@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Histogram Equalization — Image/PDF Enhancer</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- PDF.js (global build) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+  <script>
+    if (window['pdfjsLib']) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.worker.min.js";
+    }
+  </script>
+</head>
+<body>
+  <header class="app-header">
+    <h1>Histogram Equalization Enhancer</h1>
+    <p class="subtitle">Upload any <strong>Image (JPG/PNG)</strong> or <strong>PDF</strong> → Enhance via Global HE or CLAHE → Download / Save</p>
+  </header>
+
+  <main class="container layout">
+    <!-- LEFT: Main tools -->
+    <div class="main-column">
+      <section class="card uploader">
+        <label for="fileInput" class="btn primary">Choose Image/PDF</label>
+        <input id="fileInput" type="file" accept="image/*,application/pdf" />
+        <div id="dropZone" class="drop-zone" aria-label="Drop files here">
+          <strong>Drag & Drop</strong> your Image/PDF here
+        </div>
+
+        <div class="controls">
+          <select id="mode" class="btn">
+            <option value="he">Global HE (HSV-V)</option>
+            <option value="clahe">CLAHE (tile-based)</option>
+          </select>
+
+          <label class="inline">Clip
+            <input id="clipLimit" type="range" min="1" max="6" step="0.1" value="2.5">
+            <output id="clipVal" for="clipLimit">2.5</output>
+          </label>
+
+          <label class="inline">Tile
+            <input id="tileSize" type="number" min="16" max="256" step="16" value="64">
+          </label>
+
+          <!-- Strength + SCALE UI -->
+          <div class="strength-group">
+            <label class="inline no-wrap">Strength
+              <input id="strength" type="range" min="0" max="1" step="0.05" value="1">
+              <output id="strengthVal" for="strength">100%</output>
+              <span id="strengthTrend" class="trend neutral">•</span>
+            </label>
+
+            <div class="strength-scale" aria-label="Strength scale">
+              <div id="strengthFill" class="strength-fill" style="width:100%"></div>
+              <div id="strengthIndicator" class="strength-indicator" style="left:100%"></div>
+            </div>
+            <div class="strength-ticks" aria-hidden="true">
+              <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+            </div>
+          </div>
+
+          <div class="spacer"></div>
+
+          <button id="btnEqualize" class="btn" disabled>Run Histogram Equalization</button>
+          <button id="btnDownload" class="btn" disabled>Download Enhanced</button>
+          <button id="btnSaveServer" class="btn" disabled>Save to Server (PHP)</button>
+        </div>
+
+        <p class="note">PDFs render the <em>first page</em>. Large images are auto down-scaled for performance.</p>
+      </section>
+
+      <section class="preview-grid">
+        <div class="card panel">
+          <h3>Original</h3>
+          <canvas id="canvasOriginal" aria-label="Original preview"></canvas>
+        </div>
+        <div class="card panel">
+          <h3>Enhanced (Histogram Equalized)</h3>
+          <canvas id="canvasEnhanced" aria-label="Enhanced preview"></canvas>
+        </div>
+      </section>
+
+      <section id="messages" class="messages" aria-live="polite"></section>
+    </div>
+
+    <!-- RIGHT: Sidebar with quick recipes -->
+    <aside class="sidebar">
+      <div class="card">
+        <h3 class="sidebar-title">Quick Recipes (Practical Settings)</h3>
+        <p class="muted-small">Tip: <strong>Click a row</strong> to apply its settings instantly.</p>
+        <table class="recipes-table" aria-label="Quick recipes for HE/CLAHE">
+          <thead>
+            <tr>
+              <th>Use Case</th>
+              <th>Mode</th>
+              <th>Tile</th>
+              <th>Clip</th>
+              <th>Strength</th>
+            </tr>
+          </thead>
+          <tbody id="recipesBody">
+            <tr class="clickable"
+                data-name="Portrait / Selfie"
+                data-mode="clahe" data-tile="64" data-clip="2.25" data-strength="0.40">
+              <td>Portrait / Selfie (natural skin)</td><td>CLAHE</td><td>64</td><td>2.0–2.5</td><td>30–50%</td>
+            </tr>
+            <tr class="clickable"
+                data-name="Daylight / Landscape"
+                data-mode="clahe" data-tile="72" data-clip="2.5" data-strength="0.50">
+              <td>Daylight photo / landscape</td><td>CLAHE</td><td>64–80</td><td>2.0–3.0</td><td>40–60%</td>
+            </tr>
+            <tr class="clickable"
+                data-name="Night / Low-light"
+                data-mode="clahe" data-tile="80" data-clip="3.0" data-strength="0.65">
+              <td>Night / low-light photo</td><td>CLAHE</td><td>64–96</td><td>2.5–3.5</td><td>50–75%</td>
+            </tr>
+            <tr class="clickable"
+                data-name="Scanned Document (Uneven Light)"
+                data-mode="clahe" data-tile="56" data-clip="2.4" data-strength="0.70">
+              <td>Scanned document (uneven light)</td><td>CLAHE</td><td>48–64</td><td>2.0–2.8</td><td>60–80%</td>
+            </tr>
+            <tr class="clickable"
+                data-name="Old / Faded Document"
+                data-mode="clahe" data-tile="40" data-clip="3.4" data-strength="0.85">
+              <td>Old / faded document</td><td>CLAHE</td><td>32–48</td><td>3.0–4.0</td><td>70–90%</td>
+            </tr>
+            <tr class="clickable"
+                data-name="Very Flat Grayscale"
+                data-mode="he" data-tile="64" data-clip="2.7" data-strength="0.75">
+              <td>Very flat / low-contrast grayscale</td><td>Global HE or CLAHE</td><td>—</td><td>—</td><td>60–85%</td>
+            </tr>
+            <tr class="clickable"
+                data-name="Technical Grayscale"
+                data-mode="he" data-tile="64" data-clip="2.7" data-strength="0.70">
+              <td>Technical grayscale (X-ray / drawing)</td><td>Global HE</td><td>—</td><td>—</td><td>60–80%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card tiny-tip">
+        <h4>Quality Tips</h4>
+        <ul>
+          <li>Too much grain? Lower <em>Strength</em>, reduce <em>Clip</em>, increase <em>Tile</em>.</li>
+          <li>Hotspots/halos? Prefer <strong>CLAHE</strong> with Strength ≤ 70%.</li>
+          <li>For print, try ~10% higher Strength than on screen.</li>
+        </ul>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <small>Built with HTML/CSS/JS (Canvas & PDF.js) + PHP • HE/CLAHE on luminance (HSV-V)</small>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

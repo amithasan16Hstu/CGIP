@@ -1,0 +1,153 @@
+:root{
+  --bg1:#0b0e13;
+  --bg2:#0d1220;
+  --fg:#e8edf2;
+  --muted:#a7b6c8;
+  --card:#111726b3; /* translucent for glass effect */
+  --border:#26324a99;
+  --primary:#65d1ff;
+  --accent:#b8a1ff;
+  --ok:#2ee59d;
+  --warn:#ff7a7a;
+  --tableStripe:#151b29b3;
+  --glow:0 10px 30px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+  background:radial-gradient(1000px 500px at 80% -10%, #1b2340 0%, transparent 60%) no-repeat,
+             radial-gradient(800px 400px at 10% 110%, #1b2b3f 0%, transparent 65%) no-repeat,
+             linear-gradient(180deg,var(--bg1),var(--bg2) 60%,var(--bg1));
+  color:var(--fg);
+}
+
+/* ===== Header ===== */
+.app-header{ text-align:center; padding:34px 16px 12px }
+.app-header h1{ margin:0 0 6px; letter-spacing:.6px; font-weight:800 }
+.subtitle{ margin:0; color:var(--muted) }
+
+/* ===== Layout ===== */
+.container{ max-width:1250px; margin:26px auto; padding:0 16px }
+.layout{ display:grid; grid-template-columns: 1fr 360px; gap:18px; align-items:start }
+.main-column{ min-width:0 }
+.sidebar{ position:sticky; top:16px; display:flex; flex-direction:column; gap:16px }
+
+/* ===== Cards (glass) ===== */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:16px;
+  backdrop-filter: blur(8px);
+  box-shadow: var(--glow);
+}
+.tiny-tip h4{ margin:0 0 8px }
+.tiny-tip ul{ margin:0; padding-left:18px; color:var(--muted); font-size:13px }
+
+/* ===== Uploader & Controls ===== */
+input[type="file"]{ display:none }
+.btn{
+  appearance:none; border:1px solid var(--border); background:#172238; color:var(--fg);
+  padding:10px 14px; border-radius:12px; cursor:pointer; transition:.2s; margin-right:8px
+}
+.btn:hover{ transform:translateY(-1px); box-shadow:0 6px 14px rgba(0,0,0,.25) }
+.btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; box-shadow:none }
+.btn.primary{ background:linear-gradient(180deg,#8ad5ff,#58c6ff); border-color:transparent; color:#06121a; font-weight:700 }
+
+.drop-zone{
+  margin:12px 0; padding:30px; border:2px dashed var(--border); border-radius:16px; text-align:center;
+  color:var(--muted); background:#0f1730b3;
+}
+.drop-zone strong{ color:#d7ecff }
+.drop-zone.drag{ border-color:var(--primary); background:#0f1b3bb3 }
+
+.controls{ display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; align-items:flex-end }
+.inline{ display:inline-flex; align-items:center; gap:8px; margin-right:8px; font-size:12px; color:var(--muted) }
+.no-wrap{ white-space:nowrap }
+.spacer{ flex:1 1 auto }
+input[type="number"]{
+  width:80px; padding:8px; border-radius:10px; border:1px solid var(--border);
+  background:#0f1730; color:var(--fg); font-weight:600
+}
+select.btn{ padding:10px 12px; font-weight:600 }
+
+input[type="range"]{ accent-color: var(--primary) }
+#clipVal{ color:#d7ecff; font-weight:700 }
+
+/* Strength scale UI */
+.strength-group{ display:grid; grid-template-columns:1fr; gap:6px; min-width:320px }
+.strength-scale{
+  position:relative; width:270px; height:10px; border-radius:999px; border:1px solid var(--border);
+  background:linear-gradient(90deg, rgba(101,209,255,.25), rgba(101,209,255,.8));
+  overflow:hidden;
+}
+.strength-fill{
+  position:absolute; left:0; top:0; bottom:0; width:0%;
+  background:linear-gradient(90deg, rgba(101,209,255,.35), rgba(101,209,255,1));
+}
+.strength-indicator{ position:absolute; top:-4px; width:2px; height:18px; background:#fff; border-radius:2px; opacity:.9 }
+.strength-ticks{ display:flex; justify-content:space-between; width:270px; font-size:10px; color:var(--muted); padding:0 2px }
+.trend{ display:inline-block; min-width:16px; text-align:center; font-weight:800 }
+.trend.up{ color:var(--ok) } .trend.down{ color:var(--warn) } .trend.neutral{ color:var(--muted) }
+
+/* ===== Preview ===== */
+.preview-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:18px 0 8px }
+.panel h3{ margin:0 0 10px; color:var(--accent); font-weight:700 }
+canvas{ width:100%; height:auto; display:block; background:#0b0e13; border-radius:12px }
+.note{ color:var(--muted); margin:8px 2px 0 }
+
+/* ===== Recipes table ===== */
+.sidebar-title{ margin:0 0 8px; color:var(--accent); font-weight:800 }
+.recipes-table{ width:100%; border-collapse:collapse; font-size:13px }
+.recipes-table th, .recipes-table td{
+  border:1px solid var(--border); padding:8px 10px; vertical-align:top
+}
+.recipes-table thead th{ background:#192338; color:#cfe7ff; font-weight:700; position:sticky; top:0 }
+.recipes-table tbody tr:nth-child(odd){ background:var(--tableStripe) }
+.recipes-table td:nth-child(1){ min-width:170px }
+.recipes-table td:last-child{ text-align:right }
+.clickable{ cursor:pointer; transition:.15s }
+.clickable:hover{ background:#203052; transform:translateY(-1px) }
+
+/* ===== Messages/Footer ===== */
+.messages{ min-height:22px; color:var(--muted); font-size:14px }
+.footer{ opacity:.7; text-align:center; padding:18px 0 30px }
+
+/* ===== Responsive ===== */
+@media (max-width:1150px){
+  .layout{ grid-template-columns:1fr }
+  .sidebar{ position:static }
+}
+@media (max-width:900px){
+  .preview-grid{ grid-template-columns:1fr }
+}
+/* === Sidebar Quick Recipes alignment fix === */
+.sidebar .card {             /* tighten right padding so table sits closer to edge */
+  padding-right: 10px;
+}
+
+.recipes-table {
+  table-layout: fixed;       /* stable column widths, no random shifts */
+  width: 100%;
+}
+
+.recipes-table th,
+.recipes-table td {
+  padding: 8px 10px;
+}
+
+/* Strength column: center it (was right-aligned) so it doesn't look "pushed away" */
+.recipes-table th:last-child,
+.recipes-table td:last-child {
+  text-align: center;
+  width: 96px;               /* keep a consistent width */
+}
+
+/* (Optional) make the sidebar column a tad wider so the table breathes better */
+@media (min-width: 1151px) {
+  .layout {
+    grid-template-columns: 1fr 380px;  /* was 360px */
+  }
+}
